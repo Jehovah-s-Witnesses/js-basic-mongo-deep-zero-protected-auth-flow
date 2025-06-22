@@ -8,7 +8,8 @@ on:
 
 jobs:
   build:
-
+    env:
+      MONGO_URI: mongodb://root:example@127.0.0.1:27018/test
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +20,14 @@ jobs:
         node-version: 20.x
         cache: 'npm'
     - run: npm ci
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.12.0
+      with:
+        mongodb-username: root
+        mongodb-password: example
+        mongodb-db: test
+        mongodb-port: 27018
+
     - run: npm run build --if-present
     - run: npm run format
     - run: npm run test
