@@ -21,7 +21,7 @@ export const userService = {
     return user;
   },
   createAuthToken(id) {
-    const token = sign({ id: user._id }, JWT_SECRET, { expiresIn: '2h' });
+    const token = sign({ id }, JWT_SECRET, { expiresIn: '2h' });
     return token;
   },
   verifyAuthToken(token) {
