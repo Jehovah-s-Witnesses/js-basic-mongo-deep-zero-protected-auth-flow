@@ -102,7 +102,7 @@ server.post(
       return reply.status(400).send({});
     }
 
-    const token = sign({ id: user._id }, 'Secret key', { expiresIn: '2h' });
+    const token = userService.createAuthToken(user._id);
 
     reply.status(201).send({ token });
   },
