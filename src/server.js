@@ -2,7 +2,13 @@ import { initializeServer } from './initializers/initializeServer.js';
 import { User } from './db/User.js';
 import { compare, hash } from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { userNameSchema } from './schema/schema.js';
+import {
+  emailSchema,
+  passwordSchema,
+  userNameSchema,
+} from './schema/schema.js';
+import { userService } from './services/user.service.js';
+import { JWT_SECRET } from './constants/jwt.js';
 
 const { sign, verify } = jwt.default;
 
@@ -25,36 +31,22 @@ server.post(
         type: 'object',
         properties: {
           username: userNameSchema,
-          email: {
-            type: 'string',
-            minLength: 6,
-            maxLength: 40,
-            format: 'email',
-          },
-          password: {
-            type: 'string',
-            minLength: 8,
-            maxLength: 20,
-          },
+          email: emailSchema,
+          password: passwordSchema,
         },
       },
     },
   },
   async (request, reply) => {
     const { username, email, password } = request.body;
-    const userByEmail = await User.findOne({ email });
-    const userByUsername = await User.findOne({ username });
+    const userByEmail = await userService.findUserByEmail(email);
+    const userByUsername = await userService.findUserByUserName(username);
 
     if (userByEmail || userByUsername) {
-      return reply.status(401).send({ message: 'User is bad' });
+      return reply.status(400).send({ message: 'User is bad' });
     }
 
-    const user = new User({
-      username,
-      email,
-      password: await hash(password, 10),
-    });
-    await user.save();
+    await userService.createUser(email, username, password);
 
     reply.status(201).send({ message: 'Successful created' });
   },
@@ -71,33 +63,16 @@ server.post(
             type: 'object',
             required: ['username', 'password'],
             properties: {
-              username: {
-                type: 'string',
-                minLength: 2,
-                maxLength: 30,
-              },
-              password: {
-                type: 'string',
-                minLength: 8,
-                maxLength: 20,
-              },
+              username: userNameSchema,
+              password: passwordSchema,
             },
           },
           {
             type: 'object',
             required: ['email', 'password'],
             properties: {
-              email: {
-                type: 'string',
-                minLength: 6,
-                maxLength: 40,
-                format: 'email',
-              },
-              password: {
-                type: 'string',
-                minLength: 8,
-                maxLength: 20,
-              },
+              email: emailSchema,
+              password: passwordSchema,
             },
           },
         ],
@@ -106,26 +81,25 @@ server.post(
   },
   async (request, reply) => {
     const { username, email, password } = request.body;
-    const filter = {};
+
+    let user = null;
 
     if (username) {
-      filter.username = username;
+      user = userService.findUserByUserName(username);
     }
 
     if (email) {
-      filter.email = email;
+      user = userService.findUserByEmail(email);
     }
 
-    const user = await User.findOne(filter);
-
     if (!user) {
-      return reply.status(401).send({});
+      return reply.status(400).send({});
     }
 
     const isCorrectPassword = await compare(password, user.password);
 
     if (!isCorrectPassword) {
-      return reply.status(401).send({});
+      return reply.status(400).send({});
     }
 
     const token = sign({ id: user._id }, 'Secret key', { expiresIn: '2h' });
@@ -158,16 +132,13 @@ server.get(
     },
   },
   async (request, reply) => {
-    const authHeaders = request.headers.authorization;
+    const token = request.headers.authorization;
 
-    if (!authHeaders) {
-      return reply
-        .status(401)
-        .type('text/plain')
-        .send('You are not authorized!');
+    try {
+      userService.verifyAuthToken(token);
+      return reply.send('Hello from protected');
+    } catch (err) {
+      reply.status(401).send('You are not authorized');
     }
-
-    const checkHeaders = await verify(authHeaders, 'Secret key');
-    return reply.status(200).type('text/plain').send('Hello from protected');
   },
 );
