@@ -12,6 +12,8 @@ import { JWT_SECRET } from './constants/jwt.js';
 import { createUserRoute } from './routes/createUser.js';
 import { createTokenForUser } from './routes/createTokenForUser.js';
 import { verifyAuthToken } from './routes/verifyAuthToken.js';
+import { createEvent } from './routes/createEvent.js';
+import { getEvent } from './routes/getEvent.js';
 
 const { sign, verify } = jwt.default;
 
@@ -78,6 +80,38 @@ server.register(
     instance.register(
       (protectedInstance, opts, done) => {
         protectedInstance.addHook('preHandler', verifyAuthToken);
+        protectedInstance.post(
+          '/event',
+          {
+            schema: {
+              body: {
+                type: 'object',
+                required: ['title', 'plannedDate'],
+                properties: {
+                  title: {
+                    type: 'string',
+                    minLength: 4,
+                    maxLength: 30,
+                  },
+                  plannedDate: {
+                    type: 'string',
+                    format: 'date-time',
+                  },
+                },
+              },
+            },
+          },
+          createEvent,
+        );
+
+        protectedInstance.get(
+          '/event',
+          {
+            schema: {},
+          },
+          getEvent,
+        );
+
         protectedInstance.get(
           '',
           {
