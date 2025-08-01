@@ -7,11 +7,11 @@ export const createTokenForUser = async (request, reply) => {
   let user = null;
 
   if (username) {
-    user = userService.findUserByUserName(username);
+    user = await userService.findUserByUserName(username);
   }
 
   if (email) {
-    user = userService.findUserByEmail(email);
+    user = await userService.findUserByEmail(email);
   }
 
   if (!user) {
