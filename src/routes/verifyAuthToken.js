@@ -5,7 +5,6 @@ export const verifyAuthToken = async (request, reply) => {
 
   try {
     userService.verifyAuthToken(token);
-    return reply.send('Hello from protected');
   } catch (err) {
     reply.status(401).send('You are not authorized');
   }

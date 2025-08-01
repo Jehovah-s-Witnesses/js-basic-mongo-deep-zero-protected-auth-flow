@@ -75,30 +75,42 @@ server.register(
       createTokenForUser,
     );
 
-    instance.get(
-      '/protected',
-      {
-        schema: {
-          headers: {
-            type: 'object',
-            required: ['authorization'],
-            properties: {
-              authorization: {
-                type: 'string',
+    instance.register(
+      (protectedInstance, opts, done) => {
+        protectedInstance.addHook('preHandler', verifyAuthToken);
+        protectedInstance.get(
+          '',
+          {
+            schema: {
+              headers: {
+                type: 'object',
+                required: ['authorization'],
+                properties: {
+                  authorization: {
+                    type: 'string',
+                  },
+                },
+              },
+              response: {
+                200: {
+                  type: 'string',
+                },
+                401: {
+                  type: 'string',
+                },
               },
             },
           },
-          response: {
-            200: {
-              type: 'string',
-            },
-            401: {
-              type: 'string',
-            },
+          (request, reply) => {
+            reply.send('Hello from protected');
           },
-        },
+        );
+
+        done();
       },
-      verifyAuthToken,
+      {
+        prefix: '/protected',
+      },
     );
 
     done();
