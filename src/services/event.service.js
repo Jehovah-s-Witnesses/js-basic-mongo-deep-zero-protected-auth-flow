@@ -1,7 +1,7 @@
 import { Event } from '../db/Event.js';
 
 export const eventService = {
-  userEvent(userId) {
+  getEvents(userId) {
     return Event.find({ userId });
   },
   async createEvent(title, plannedDate, userId) {
