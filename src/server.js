@@ -107,7 +107,33 @@ server.register(
         protectedInstance.get(
           '/event',
           {
-            schema: {},
+            schema: {
+              body: {
+                type: 'object',
+                properties: {
+                  title: {
+                    type: 'string',
+                    minLength: 4,
+                    maxLength: 30,
+                  },
+                  plannedDate: {
+                    type: 'string',
+                    format: 'date-time',
+                  },
+                  userId: {
+                    type: 'string',
+                  },
+                },
+              },
+              response: {
+                200: {
+                  type: 'string',
+                },
+                401: {
+                  type: 'string',
+                },
+              },
+            },
           },
           getEvent,
         );
