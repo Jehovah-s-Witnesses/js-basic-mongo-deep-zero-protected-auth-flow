@@ -14,6 +14,7 @@ import { createTokenForUser } from './routes/createTokenForUser.js';
 import { verifyAuthToken } from './routes/verifyAuthToken.js';
 import { createEvent } from './routes/createEvent.js';
 import { getEvent } from './routes/getEvent.js';
+import { deleteEventRoute } from './routes/deleteEvent.js';
 
 const { sign, verify } = jwt.default;
 
@@ -108,9 +109,32 @@ server.register(
           '/event',
           {
             schema: {
+              querystring: {
+                type: 'object',
+                properties: {
+                  limit: {
+                    type: 'integer',
+                    minimum: 1,
+                    maximum: 10,
+                  },
+                  offset: {
+                    type: 'integer',
+                    minimum: 0,
+                  },
+                },
+                required: ['limit', 'offset'],
+              },
               response: {
                 200: {
-                  type: 'array',
+                  type: 'object',
+                  properties: {
+                    count: {
+                      type: 'string',
+                    },
+                    items: {
+                      type: 'array',
+                    },
+                  },
                 },
               },
             },
@@ -144,6 +168,27 @@ server.register(
           (request, reply) => {
             reply.send('Hello from protected');
           },
+        );
+
+        protectedInstance.delete(
+          '/event/:id',
+          {
+            schema: {
+              param: {
+                type: 'object',
+                required: ['userId', 'id'],
+                properties: {
+                  userId: {
+                    type: 'string',
+                  },
+                  id: {
+                    type: 'string',
+                  },
+                },
+              },
+            },
+          },
+          deleteEventRoute,
         );
 
         done();

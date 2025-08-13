@@ -6,7 +6,9 @@ export const createUserRoute = async (request, reply) => {
   const userByUsername = await userService.findUserByUserName(username);
 
   if (userByEmail || userByUsername) {
-    return reply.status(400).send({ message: 'user is bad' });
+    return reply
+      .status(400)
+      .send({ message: 'User with this email or username already exist' });
   }
 
   await userService.createUser(email, username, password);

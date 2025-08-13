@@ -1,8 +1,12 @@
 import { Event } from '../db/Event.js';
 
 export const eventService = {
-  getEvents(userId) {
-    return Event.find({ userId });
+  async getEvents(userId, limit, offset) {
+    const count = await Event.countDocuments({ userId });
+
+    const events = await Event.find({ userId }).limit(limit).skip(offset);
+
+    return { count: count, items: events };
   },
   async createEvent(title, plannedDate, userId) {
     const event = new Event({
@@ -14,5 +18,9 @@ export const eventService = {
     await event.save();
 
     return event;
+  },
+
+  async deleteEvent(userId, id) {
+    await Event.deleteOne({ userId, _id: id });
   },
 };

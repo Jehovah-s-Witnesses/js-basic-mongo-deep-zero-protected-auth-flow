@@ -15,16 +15,16 @@ export const createTokenForUser = async (request, reply) => {
   }
 
   if (!user) {
-    return reply.status(400).send({});
+    return reply.status(400).send({ message: 'User does not exist' });
   }
 
   const isCorrectPassword = await compare(password, user.password);
 
   if (!isCorrectPassword) {
-    return reply.status(400).send({});
+    return reply.status(400).send({ message: 'Password is not correct' });
   }
 
   const token = userService.createAuthToken(user._id);
 
-  reply.status(201).send({ token });
+  reply.status(201).send({ token, message: 'User was successful authorized' });
 };
