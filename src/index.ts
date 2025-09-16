@@ -1,5 +1,5 @@
-import { server } from './server.js';
-import { connectToMongoose } from './initializers/connectToMongoose.js';
+import { server } from './server.ts';
+import { connectToMongoose } from './initializers/connectToMongoose.ts';
 
 connectToMongoose('mongodb://root:example@localhost:27019/')
   .then(() => {

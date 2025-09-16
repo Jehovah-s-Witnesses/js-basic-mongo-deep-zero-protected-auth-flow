@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { server } from './server.js';
-import { connectToMongoose } from './initializers/connectToMongoose.js';
+import { server } from './server.ts';
+import { connectToMongoose } from './initializers/connectToMongoose.ts';
 
 describe('Basic test server', () => {
   it('should returns only 400 errors', async () => {

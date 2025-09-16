@@ -32,7 +32,7 @@ Or just click on the stop button in the GUI interface of docker desktop
 
 ## The task
 
-### Run via a docker database and connect to your application BEFORE you run listening server. Use for this function in ```src/initializers/connectToMongoose.js``` and in this func send connection string for mongo
+### Run via a docker database and connect to your application BEFORE you run listening server. Use for this function in ```src/initializers/connectToMongoose.ts``` and in this func send connection string for mongo
 
 ### Create one mongo-model for user and save inside username, password, email and id. For password you should hash it via bcrypt
 

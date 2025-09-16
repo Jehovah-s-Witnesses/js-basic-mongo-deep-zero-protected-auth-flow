@@ -1,6 +1,9 @@
-import { userService } from '../services/user.service.js';
+import { userService } from '../services/user.service.ts';
+import type { RouteHandler } from 'fastify';
 
-export const createUserRoute = async (request, reply) => {
+export const createUserRoute: RouteHandler<{
+  Body: { username: string; email: string; password: string };
+}> = async (request, reply) => {
   const { username, email, password } = request.body;
   const userByEmail = await userService.findUserByEmail(email);
   const userByUsername = await userService.findUserByUserName(username);

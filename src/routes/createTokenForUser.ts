@@ -1,17 +1,20 @@
-import { userService } from '../services/user.service.js';
+import { userService } from '../services/user.service.ts';
 import { compare } from 'bcrypt';
+import type { RouteHandler } from 'fastify';
 
-export const createTokenForUser = async (request, reply) => {
+export const createTokenForUser: RouteHandler<{
+  Body: { username: string; email: string; password: string };
+}> = async (request, reply) => {
   const { username, email, password } = request.body;
 
   let user = null;
 
-  if (username) {
-    user = await userService.findUserByUserName(username);
-  }
-
   if (email) {
     user = await userService.findUserByEmail(email);
+  }
+
+  if (username) {
+    user = await userService.findUserByUserName(username);
   }
 
   if (!user) {
@@ -24,7 +27,7 @@ export const createTokenForUser = async (request, reply) => {
     return reply.status(400).send({ message: 'Password is not correct' });
   }
 
-  const token = userService.createAuthToken(user._id);
+  const token = userService.createAuthToken(user._id.toString());
 
   reply.status(201).send({ token, message: 'User was successful authorized' });
 };

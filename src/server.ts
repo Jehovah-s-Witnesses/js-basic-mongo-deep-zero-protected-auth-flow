@@ -1,22 +1,15 @@
-import { initializeServer } from './initializers/initializeServer.js';
-import { User } from './db/User.js';
-import { compare, hash } from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
+import { initializeServer } from './initializers/initializeServer.ts';
 import {
   emailSchema,
   passwordSchema,
   userNameSchema,
-} from './schema/schema.js';
-import { userService } from './services/user.service.js';
-import { JWT_SECRET } from './constants/jwt.js';
-import { createUserRoute } from './routes/createUser.js';
-import { createTokenForUser } from './routes/createTokenForUser.js';
-import { verifyAuthToken } from './routes/verifyAuthToken.js';
-import { createEvent } from './routes/createEvent.js';
-import { getEvent } from './routes/getEvent.js';
-import { deleteEventRoute } from './routes/deleteEvent.js';
-
-const { sign, verify } = jwt.default;
+} from './schema/schema.ts';
+import { createUserRoute } from './routes/createUser.ts';
+import { createTokenForUser } from './routes/createTokenForUser.ts';
+import { verifyAuthToken } from './routes/verifyAuthToken.ts';
+import { createEvent } from './routes/createEvent.ts';
+import { getEvent } from './routes/getEvent.ts';
+import { deleteEventRoute } from './routes/deleteEvent.ts';
 
 export const server = await initializeServer();
 
@@ -29,7 +22,7 @@ server.route({
 });
 
 server.register(
-  (instance, opts, done) => {
+  (instance, _opts, done) => {
     instance.post(
       '/user',
       {
@@ -79,7 +72,7 @@ server.register(
     );
 
     instance.register(
-      (protectedInstance, opts, done) => {
+      (protectedInstance, _opts, done) => {
         protectedInstance.addHook('preHandler', verifyAuthToken);
         protectedInstance.post(
           '/event',
@@ -92,7 +85,7 @@ server.register(
                   title: {
                     type: 'string',
                     minLength: 4,
-                    maxLength: 30,
+                    maxLength: 50,
                   },
                   plannedDate: {
                     type: 'string',
@@ -165,7 +158,7 @@ server.register(
               },
             },
           },
-          (request, reply) => {
+          (_request, reply) => {
             reply.send('Hello from protected');
           },
         );
@@ -174,7 +167,7 @@ server.register(
           '/event/:id',
           {
             schema: {
-              param: {
+              params: {
                 type: 'object',
                 required: ['userId', 'id'],
                 properties: {

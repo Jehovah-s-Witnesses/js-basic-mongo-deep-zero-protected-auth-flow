@@ -19,7 +19,10 @@ export const initializeServer = async () => {
     },
   }).withTypeProvider();
 
-  await server.register(fastifyCors);
+  await server.register(fastifyCors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  });
   await server.register(fastifyCookie);
   await server.register(fastifySwagger);
   await server.register(fastifySwaggerUi);
